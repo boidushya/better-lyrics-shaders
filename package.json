@@ -1,0 +1,35 @@
+{
+  "name": "better-lyrics-shaders",
+  "displayName": "Better Lyrics Shaders",
+  "version": "1.0.0",
+  "description": "Add beautiful mesh gradient effects to YouTube Music",
+  "author": "Boidu",
+  "scripts": {
+    "dev": "plasmo dev --verbose",
+    "build": "plasmo build",
+    "package": "plasmo package",
+    "lint:fix": "biome lint --write"
+  },
+  "dependencies": {
+    "@paper-design/shaders-react": "^0.0.46",
+    "@plasmohq/storage": "^1.9.0",
+    "colorthief": "^2.6.0",
+    "plasmo": "0.90.5",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/colorthief": "^2.6.0",
+    "@biomejs/biome": "1.8.3",
+    "@types/chrome": "0.0.245",
+    "@types/node": "20.5.9",
+    "@types/react": "18.2.21",
+    "@types/react-dom": "18.2.7",
+    "prettier": "3.0.3",
+    "typescript": "5.2.2"
+  },
+  "manifest": {
+    "host_permissions": ["https://music.youtube.com/*"],
+    "permissions": ["storage", "activeTab"]
+  }
+}
