@@ -3,6 +3,12 @@ import ColorThief from "colorthief";
 import type { PlasmoCSConfig } from "plasmo";
 import React from "react";
 import { createRoot } from "react-dom/client";
+import { Storage } from "@plasmohq/storage";
+import { 
+  type GradientSettings, 
+  DEFAULT_GRADIENT_SETTINGS,
+  GRADIENT_SETTINGS_STORAGE_KEY 
+} from "../shared/constants/gradientSettings";
 
 export const config: PlasmoCSConfig = {
   matches: ["https://music.youtube.com/*"],
@@ -12,29 +18,22 @@ export const config: PlasmoCSConfig = {
 let currentColors: string[] = [];
 let lastImageSrc = "";
 
-interface GradientSettings {
-  distortion: number;
-  swirl: number;
-  offsetX: number;
-  offsetY: number;
-  scale: number;
-  rotation: number;
-  speed: number;
-  opacity: number;
-}
+// Initialize storage
+const storage = new Storage();
 
-const defaultSettings: GradientSettings = {
-  distortion: 0.95,
-  swirl: 0.95,
-  offsetX: 0,
-  offsetY: 0,
-  scale: 1.25,
-  rotation: 0,
-  speed: 0.5,
-  opacity: 0.33,
+let gradientSettings: GradientSettings = { ...DEFAULT_GRADIENT_SETTINGS };
+
+// Load settings from storage on initialization
+const loadGradientSettings = async () => {
+  try {
+    const storedSettings = await storage.get<GradientSettings>(GRADIENT_SETTINGS_STORAGE_KEY);
+    if (storedSettings) {
+      gradientSettings = { ...DEFAULT_GRADIENT_SETTINGS, ...storedSettings };
+    }
+  } catch (error) {
+    console.error("Error loading gradient settings from storage:", error);
+  }
 };
-
-let gradientSettings: GradientSettings = { ...defaultSettings };
 
 const rgbToHsl = (red: number, green: number, blue: number) => {
   red /= 255;
@@ -356,13 +355,16 @@ const cleanupOrphanedGradients = () => {
 };
 
 if (document.readyState === "loading") {
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
+    await loadGradientSettings();
     cleanupOrphanedGradients();
     injectGradientIntoPlayerPage();
   });
 } else {
-  cleanupOrphanedGradients();
-  injectGradientIntoPlayerPage();
+  loadGradientSettings().then(() => {
+    cleanupOrphanedGradients();
+    injectGradientIntoPlayerPage();
+  });
 }
 
 export default <></>;

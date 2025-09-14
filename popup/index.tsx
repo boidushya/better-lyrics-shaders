@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./popup.css";
 
 // Hooks
-import { useTabState, useContentScript } from "./hooks";
+import { useTabState, useContentScript, useGradientSettings } from "./hooks";
 
 // Components
 import { 
@@ -21,17 +21,15 @@ const Popup: React.FC = () => {
     colors: currentSongColors,
     songTitle,
     songAuthor,
-    gradientSettings,
     updateColors,
     updateGradientSettings,
   } = useContentScript();
 
-  const [localGradientSettings, setLocalGradientSettings] = useState<GradientSettings>(gradientSettings);
-
-  // Sync local settings when content script settings change
-  React.useEffect(() => {
-    setLocalGradientSettings(gradientSettings);
-  }, [gradientSettings]);
+  const {
+    gradientSettings,
+    updateGradientSetting,
+    resetGradientSettings,
+  } = useGradientSettings();
 
   const handleColorChange = async (index: number, color: string) => {
     const newColors = [...currentSongColors];
@@ -40,14 +38,13 @@ const Popup: React.FC = () => {
   };
 
   const handleGradientSettingChange = async (key: keyof GradientSettings, value: number) => {
-    const newSettings = { ...localGradientSettings, [key]: value };
-    setLocalGradientSettings(newSettings);
+    const newSettings = updateGradientSetting(key, value);
     await updateGradientSettings(newSettings);
   };
 
   const handleResetAllGradientSettings = async () => {
-    setLocalGradientSettings(defaultSettings);
-    await updateGradientSettings(defaultSettings);
+    const newSettings = await resetGradientSettings();
+    await updateGradientSettings(newSettings);
   };
 
   return (
@@ -66,7 +63,7 @@ const Popup: React.FC = () => {
 
         {activeTab === 'controls' && (
           <ControlsTab
-            settings={localGradientSettings}
+            settings={gradientSettings}
             onSettingChange={handleGradientSettingChange}
             onResetAll={handleResetAllGradientSettings}
           />
