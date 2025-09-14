@@ -12,6 +12,30 @@ export const config: PlasmoCSConfig = {
 let currentColors: string[] = [];
 let lastImageSrc = "";
 
+interface GradientSettings {
+  distortion: number;
+  swirl: number;
+  offsetX: number;
+  offsetY: number;
+  scale: number;
+  rotation: number;
+  speed: number;
+  opacity: number;
+}
+
+const defaultSettings: GradientSettings = {
+  distortion: 0.95,
+  swirl: 0.95,
+  offsetX: 0,
+  offsetY: 0,
+  scale: 1.25,
+  rotation: 0,
+  speed: 0.5,
+  opacity: 0.33,
+};
+
+let gradientSettings: GradientSettings = { ...defaultSettings };
+
 const rgbToHsl = (red: number, green: number, blue: number) => {
   red /= 255;
   green /= 255;
@@ -47,6 +71,7 @@ const rgbToHsl = (red: number, green: number, blue: number) => {
     lightness: Math.round(l * 100),
   };
 };
+
 const extractColorsFromImage = async (img: HTMLImageElement): Promise<string[]> => {
   try {
     const response = await fetch(img.src);
@@ -93,9 +118,10 @@ const extractColorsFromImage = async (img: HTMLImageElement): Promise<string[]> 
 
 interface GradientOverlayProps {
   colors: string[];
+  settings: GradientSettings;
 }
 
-const GradientOverlay: React.FC<GradientOverlayProps> = ({ colors }) => {
+const GradientOverlay: React.FC<GradientOverlayProps> = ({ colors, settings }) => {
   return (
     <div
       style={{
@@ -106,7 +132,7 @@ const GradientOverlay: React.FC<GradientOverlayProps> = ({ colors }) => {
         height: "calc(100% + 128px)",
         pointerEvents: "none",
         zIndex: 0,
-        opacity: 1,
+        opacity: settings.opacity,
       }}
       data-colors={JSON.stringify(colors)}
     >
@@ -115,13 +141,13 @@ const GradientOverlay: React.FC<GradientOverlayProps> = ({ colors }) => {
           height: "100%",
           width: "100%",
         }}
-        distortion={0.95}
-        swirl={0.95}
-        offsetX={0}
-        offsetY={0}
-        scale={1.25}
-        rotation={0}
-        speed={0.5}
+        distortion={settings.distortion}
+        swirl={settings.swirl}
+        offsetX={settings.offsetX}
+        offsetY={settings.offsetY}
+        scale={settings.scale}
+        rotation={settings.rotation}
+        speed={settings.speed}
         colors={colors}
       />
     </div>
@@ -180,11 +206,11 @@ const injectGradientIntoPlayerPage = () => {
     playerPage.insertBefore(gradientContainer, playerPage.firstChild);
 
     root = createRoot(gradientContainer);
-    root.render(<GradientOverlay colors={currentColors} />);
+    root.render(<GradientOverlay colors={currentColors} settings={gradientSettings} />);
 
     setTimeout(() => {
       if (gradientContainer) {
-        gradientContainer.style.opacity = "0.33";
+        gradientContainer.style.opacity = "1";
       }
     }, 100);
   };
@@ -210,9 +236,9 @@ const injectGradientIntoPlayerPage = () => {
 
     if (root && gradientContainer) {
       setTimeout(() => {
-        root.render(<GradientOverlay colors={colors} />);
+        root.render(<GradientOverlay colors={colors} settings={gradientSettings} />);
         if (gradientContainer) {
-          gradientContainer.style.opacity = "0.33";
+          gradientContainer.style.opacity = "1";
         }
       }, 150);
     } else {
@@ -220,7 +246,16 @@ const injectGradientIntoPlayerPage = () => {
     }
   };
 
+  const updateGradientSettings = (settings: GradientSettings) => {
+    gradientSettings = settings;
+
+    if (root && gradientContainer && currentColors.length > 0) {
+      root.render(<GradientOverlay colors={currentColors} settings={gradientSettings} />);
+    }
+  };
+
   (window as any).updateGradientColors = updateGradientColors;
+  (window as any).updateGradientSettings = updateGradientSettings;
 
   const checkAndUpdateGradient = async () => {
     const playerPage = document.getElementById("player-page");
@@ -280,17 +315,35 @@ const injectGradientIntoPlayerPage = () => {
 };
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message.action === "getCurrentColors") {
+  if (message.action === "getCurrentData" || message.action === "getCurrentColors") {
     const songTitleElement = document.querySelector(".title.style-scope.ytmusic-player-bar");
     const songTitle = songTitleElement ? songTitleElement.textContent : "";
 
-    sendResponse({ colors: currentColors, songTitle: songTitle });
+    const songAuthorElement = document.querySelector(".subtitle.style-scope.ytmusic-player-bar");
+    const songAuthor = songAuthorElement ? songAuthorElement.textContent.split("•")[0] : "";
+
+    console.log;
+
+    sendResponse({
+      colors: currentColors,
+      songTitle: songTitle,
+      songAuthor: songAuthor,
+      gradientSettings: gradientSettings,
+    });
     return true;
   } else if (message.action === "updateColors") {
     if ((window as any).updateGradientColors) {
       (window as any).updateGradientColors(message.colors);
     } else {
       currentColors = message.colors;
+    }
+    sendResponse({ success: true });
+    return true;
+  } else if (message.action === "updateGradientSettings") {
+    if ((window as any).updateGradientSettings) {
+      (window as any).updateGradientSettings(message.settings);
+    } else {
+      gradientSettings = message.settings;
     }
     sendResponse({ success: true });
     return true;

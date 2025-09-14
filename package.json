@@ -1,8 +1,8 @@
 {
   "name": "better-lyrics-shaders",
   "displayName": "Better Lyrics Shaders",
-  "version": "0.0.1",
-  "description": "Add beautiful mesh gradient effects to YouTube Music",
+  "version": "0.0.2",
+  "description": "Add beautiful gradient effects to YouTube Music",
   "author": "Boidu",
   "scripts": {
     "dev": "plasmo dev --verbose",
