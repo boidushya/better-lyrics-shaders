@@ -24,33 +24,21 @@ A Chrome extension built with Plasmo and React that adds beautiful, customizable
    cd better-lyrics-shader
    ```
 
-2. **Create all the project files**
-   Save each file from the artifacts in the appropriate location:
-   ```
-   better-lyrics-shader/
-   ├── package.json
-   ├── tsconfig.json
-   ├── popup.tsx
-   ├── popup.css
-   └── contents/
-       └── youtube-music.tsx
-   ```
-
-3. **Install dependencies**
+2. **Install dependencies**
    ```bash
    npm install
    # or
    yarn install
    ```
 
-4. **Build the extension**
+3. **Build the extension**
    ```bash
    npm run build
    # or
    yarn build
    ```
 
-5. **Load in Chrome**
+4. **Load in Chrome**
    - Open Chrome and go to `chrome://extensions/`
    - Enable "Developer mode"
    - Click "Load unpacked"
@@ -79,20 +67,9 @@ Then load the `build/chrome-mv3-dev` folder in Chrome.
 
 ### Colors
 - **5 Gradient Colors**: Full HSL color control
+- Tweak controls for gradient
 - Use color pickers or enter HSL values directly
 - Real-time preview of color changes
-
-## 📁 Project Structure
-
-```
-better-lyrics-shader/
-├── package.json              # Dependencies and Plasmo config
-├── tsconfig.json             # TypeScript configuration
-├── popup.tsx                 # Settings popup React component
-├── popup.css                 # Popup styling
-└── contents/
-    └── youtube-music.tsx     # Content script with GrainGradient
-```
 
 ## 🚀 Building for Production
 
