@@ -62,10 +62,90 @@ export const useGradientSettings = () => {
     return DEFAULT_GRADIENT_SETTINGS;
   };
 
+  const exportSettings = useCallback(() => {
+    const settingsData = {
+      version: "1.0",
+      settings: localSettings,
+      exportedAt: new Date().toISOString()
+    };
+    
+    const blob = new Blob([JSON.stringify(settingsData, null, 2)], {
+      type: 'application/json'
+    });
+    
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `better-lyrics-shaders-settings-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, [localSettings]);
+
+  const importSettings = useCallback((): Promise<GradientSettings | null> => {
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.json';
+      
+      input.onchange = async (e) => {
+        const file = (e.target as HTMLInputElement).files?.[0];
+        if (!file) {
+          resolve(null);
+          return;
+        }
+        
+        try {
+          const text = await file.text();
+          const data = JSON.parse(text);
+          
+          if (data.settings && typeof data.settings === 'object') {
+            // Validate that all required keys exist
+            const requiredKeys: (keyof GradientSettings)[] = [
+              'distortion', 'swirl', 'offsetX', 'offsetY', 
+              'scale', 'rotation', 'speed', 'opacity'
+            ];
+            
+            const isValid = requiredKeys.every(key => 
+              typeof data.settings[key] === 'number'
+            );
+            
+            if (isValid) {
+              // Clear any pending debounced updates
+              if (debounceRef.current) {
+                clearTimeout(debounceRef.current);
+              }
+              
+              // Update both local and stored settings immediately
+              setLocalSettings(data.settings);
+              await setStoredSettings(data.settings);
+              resolve(data.settings);
+            } else {
+              alert('Invalid settings file format');
+              resolve(null);
+            }
+          } else {
+            alert('Invalid settings file format');
+            resolve(null);
+          }
+        } catch (error) {
+          alert('Error reading settings file');
+          console.error('Import error:', error);
+          resolve(null);
+        }
+      };
+      
+      input.click();
+    });
+  }, [setStoredSettings]);
+
   return {
     gradientSettings: localSettings,
     setGradientSettings: setStoredSettings,
     updateGradientSetting,
     resetGradientSettings,
+    exportSettings,
+    importSettings,
   };
 };

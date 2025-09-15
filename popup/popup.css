@@ -333,28 +333,55 @@ body {
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
-.reset-button {
-  width: 100%;
-  padding: 12px;
+.controls-actions {
+  gap: 8px;
   margin-top: 24px;
-	margin-bottom: 4px;
+  margin-bottom: 4px;
+	display: grid;
+	grid-template-columns: 1fr 1fr 2fr;
+}
+
+.action-button {
+  flex: 1;
+  padding: 12px;
   background: rgba(255, 255, 255, 0.1);
-	color: rgba(255,255,255,0.8);
+  color: rgba(255, 255, 255, 0.8);
   border: none;
   font-size: 12px;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
   cursor: pointer;
   transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.action-button:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.action-button:active {
+  background: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 1);
+  transform: scale(0.98);
+}
+
+.action-button svg {
+  flex-shrink: 0;
+}
+
+.import-button:hover {
+  background: rgba(74, 222, 128, 0.15);
+  color: rgb(74, 222, 128);
+}
+
+.export-button:hover {
+  background: rgba(59, 130, 246, 0.15);
+  color: rgb(59, 130, 246);
 }
 
 .reset-button:hover {
-  background: rgba(255, 255, 255, 0.15);
-	color: rgba(255,255,255,0.9);
-}
-
-.reset-button:active {
-	background: rgba(255, 255, 255, 0.2);
-	color: rgba(255,255,255,1);
+  background: rgba(239, 68, 68, 0.15);
+  color: rgb(239, 68, 68);
 }

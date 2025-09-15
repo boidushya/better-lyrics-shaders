@@ -29,6 +29,8 @@ const Popup: React.FC = () => {
     gradientSettings,
     updateGradientSetting,
     resetGradientSettings,
+    exportSettings,
+    importSettings,
   } = useGradientSettings();
 
   const handleColorChange = async (index: number, color: string) => {
@@ -45,6 +47,18 @@ const Popup: React.FC = () => {
   const handleResetAllGradientSettings = async () => {
     const newSettings = await resetGradientSettings();
     await updateGradientSettings(newSettings);
+  };
+
+  const handleExportSettings = () => {
+    exportSettings();
+  };
+
+  const handleImportSettings = async () => {
+    const importedSettings = await importSettings();
+    if (importedSettings) {
+      // Update content script with imported settings
+      await updateGradientSettings(importedSettings);
+    }
   };
 
   return (
@@ -66,6 +80,8 @@ const Popup: React.FC = () => {
             settings={gradientSettings}
             onSettingChange={handleGradientSettingChange}
             onResetAll={handleResetAllGradientSettings}
+            onExport={handleExportSettings}
+            onImport={handleImportSettings}
           />
         )}
       </div>
