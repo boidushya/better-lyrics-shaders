@@ -104,12 +104,16 @@ export const useGradientSettings = () => {
             // Validate that all required keys exist
             const requiredKeys: (keyof GradientSettings)[] = [
               'distortion', 'swirl', 'offsetX', 'offsetY', 
-              'scale', 'rotation', 'speed', 'opacity'
+              'scale', 'rotation', 'speed', 'opacity',
+              'audioResponsive', 'audioSpeedMultiplier', 'audioScaleBoost'
             ];
             
-            const isValid = requiredKeys.every(key => 
-              typeof data.settings[key] === 'number'
-            );
+            const isValid = requiredKeys.every(key => {
+              if (key === 'audioResponsive') {
+                return typeof data.settings[key] === 'boolean';
+              }
+              return typeof data.settings[key] === 'number';
+            });
             
             if (isValid) {
               // Clear any pending debounced updates

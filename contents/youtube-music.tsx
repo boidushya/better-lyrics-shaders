@@ -84,9 +84,7 @@ const initializeAudioAnalysis = async () => {
     analyser.connect(audioContext.destination);
 
     isAudioInitialized = true;
-    if (gradientSettings.audioResponsive) {
-      startAudioAnalysis();
-    }
+    startAudioAnalysis();
 
     console.log("Audio analysis initialized successfully");
   } catch (error) {
@@ -95,7 +93,7 @@ const initializeAudioAnalysis = async () => {
 };
 
 const analyzeAudio = () => {
-  if (!analyser || !gradientSettings.audioResponsive) return;
+  if (!analyser) return;
 
   const bufferLength = analyser.frequencyBinCount;
   const dataArray = new Uint8Array(bufferLength);
@@ -107,10 +105,10 @@ const analyzeAudio = () => {
     if (amplitude > peak) peak = amplitude;
   }
 
-  const isBeat = peak > 0.8;
+  const isBeat = peak > 0.75;
 
-  const speedMultiplier = isBeat ? gradientSettings.audioSpeedMultiplier : 1;
-  const scaleMultiplier = isBeat ? 1 + (gradientSettings.audioScaleBoost / 100) : 1;
+  const speedMultiplier = gradientSettings.audioResponsive && isBeat ? gradientSettings.audioSpeedMultiplier : 1;
+  const scaleMultiplier = gradientSettings.audioResponsive && isBeat ? 1 + gradientSettings.audioScaleBoost / 100 : 1;
 
   dynamicMultipliers = {
     speedMultiplier,
@@ -127,14 +125,17 @@ const updateDynamicGradient = () => {
 };
 
 const handleAudioResponsiveToggle = () => {
-  if (gradientSettings.audioResponsive && isAudioInitialized) {
+  if (isAudioInitialized) {
     startAudioAnalysis();
   } else {
     if (audioAnalysisInterval) {
       clearInterval(audioAnalysisInterval);
       audioAnalysisInterval = null;
     }
-    dynamicMultipliers = { ...DEFAULT_DYNAMIC_MULTIPLIERS };
+  }
+  
+  if (!gradientSettings.audioResponsive) {
+    dynamicMultipliers = { speedMultiplier: 1, scaleMultiplier: 1 };
     updateDynamicGradient();
   }
 };
