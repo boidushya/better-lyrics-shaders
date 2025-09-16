@@ -7,6 +7,12 @@ export interface GradientSettings {
   rotation: number;
   speed: number;
   opacity: number;
+  audioResponsive: boolean;
+}
+
+export interface DynamicMultipliers {
+  speedMultiplier: number;
+  scaleMultiplier: number;
 }
 
 export const DEFAULT_GRADIENT_SETTINGS: GradientSettings = {
@@ -18,6 +24,12 @@ export const DEFAULT_GRADIENT_SETTINGS: GradientSettings = {
   rotation: 0,
   speed: 0.5,
   opacity: 0.33,
+  audioResponsive: true,
+};
+
+export const DEFAULT_DYNAMIC_MULTIPLIERS: DynamicMultipliers = {
+  speedMultiplier: 0,
+  scaleMultiplier: 0,
 };
 
 export const GRADIENT_SETTINGS_STORAGE_KEY = "gradientSettings";

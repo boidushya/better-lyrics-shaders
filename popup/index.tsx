@@ -2,31 +2,21 @@ import React, { useState } from "react";
 import "./popup.css";
 
 // Hooks
-import { useTabState, useContentScript, useGradientSettings } from "./hooks";
+import { useContentScript, useGradientSettings, useTabState } from "./hooks";
 
 // Components
-import { 
-  Header, 
-  TabBar, 
-  ColorsTab, 
-  ControlsTab 
-} from "./components";
+import { ColorsTab, ControlsTab, Header, TabBar } from "./components";
 
 // Types
 import { GradientSettings, defaultSettings } from "./types";
 
 const Popup: React.FC = () => {
   const { activeTab, setActiveTab } = useTabState();
-  const {
-    colors: currentSongColors,
-    songTitle,
-    songAuthor,
-    updateColors,
-    updateGradientSettings,
-  } = useContentScript();
+  const { colors: currentSongColors, songTitle, songAuthor, updateColors, updateGradientSettings } = useContentScript();
 
   const {
     gradientSettings,
+    setGradientSettings,
     updateGradientSetting,
     resetGradientSettings,
     exportSettings,
@@ -41,6 +31,12 @@ const Popup: React.FC = () => {
 
   const handleGradientSettingChange = async (key: keyof GradientSettings, value: number) => {
     const newSettings = updateGradientSetting(key, value);
+    await updateGradientSettings(newSettings);
+  };
+
+  const handleToggleChange = async (key: keyof GradientSettings, value: boolean) => {
+    const newSettings = { ...gradientSettings, [key]: value };
+    await setGradientSettings(newSettings);
     await updateGradientSettings(newSettings);
   };
 
@@ -64,21 +60,17 @@ const Popup: React.FC = () => {
   return (
     <div className="popup-container">
       <Header songTitle={songTitle} songAuthor={songAuthor} />
-      
+
       <TabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
       <div className="content">
-        {activeTab === 'colors' && (
-          <ColorsTab
-            colors={currentSongColors}
-            onColorChange={handleColorChange}
-          />
-        )}
+        {activeTab === "colors" && <ColorsTab colors={currentSongColors} onColorChange={handleColorChange} />}
 
-        {activeTab === 'controls' && (
+        {activeTab === "controls" && (
           <ControlsTab
             settings={gradientSettings}
             onSettingChange={handleGradientSettingChange}
+            onToggleChange={handleToggleChange}
             onResetAll={handleResetAllGradientSettings}
             onExport={handleExportSettings}
             onImport={handleImportSettings}

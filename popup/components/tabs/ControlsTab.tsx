@@ -1,10 +1,12 @@
 import React from "react";
 import { GradientSettings, defaultSettings } from "../../types";
 import { ControlSlider } from "../ControlSlider";
+import { ControlToggle } from "../ControlToggle";
 
 interface ControlsTabProps {
   settings: GradientSettings;
   onSettingChange: (key: keyof GradientSettings, value: number) => void;
+  onToggleChange: (key: keyof GradientSettings, value: boolean) => void;
   onResetAll: () => void;
   onExport: () => void;
   onImport: () => void;
@@ -13,21 +15,36 @@ interface ControlsTabProps {
 export const ControlsTab: React.FC<ControlsTabProps> = ({
   settings,
   onSettingChange,
+  onToggleChange,
   onResetAll,
   onExport,
   onImport,
 }) => {
   const handleReset = (key: keyof GradientSettings) => {
-    onSettingChange(key, defaultSettings[key]);
+    onSettingChange(key, defaultSettings[key] as number);
   };
 
   return (
     <div className="tab-content">
       <div className="gradient-controls-section">
         <div className="controls-grid">
-          {Object.entries(settings).map(([key, value]) => (
-            <ControlSlider key={key} keyName={key} value={value} onChange={onSettingChange} onReset={handleReset} />
-          ))}
+          <ControlToggle
+            label="Audio Responsive"
+            value={settings.audioResponsive}
+            onChange={value => onToggleChange("audioResponsive", value)}
+          />
+
+          {Object.entries(settings)
+            .filter(([key]) => key !== "audioResponsive")
+            .map(([key, value]) => (
+              <ControlSlider
+                key={key}
+                keyName={key}
+                value={value as number}
+                onChange={onSettingChange}
+                onReset={handleReset}
+              />
+            ))}
         </div>
 
         <div className="controls-actions">
