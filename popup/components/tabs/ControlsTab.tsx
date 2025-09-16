@@ -21,7 +21,11 @@ export const ControlsTab: React.FC<ControlsTabProps> = ({
   onImport,
 }) => {
   const handleReset = (key: keyof GradientSettings) => {
-    onSettingChange(key, defaultSettings[key] as number);
+    if (key === 'audioResponsive') {
+      onToggleChange(key, defaultSettings[key] as boolean);
+    } else {
+      onSettingChange(key, defaultSettings[key] as number);
+    }
   };
 
   return (
@@ -35,7 +39,7 @@ export const ControlsTab: React.FC<ControlsTabProps> = ({
           />
 
           {Object.entries(settings)
-            .filter(([key]) => key !== "audioResponsive")
+            .filter(([key]) => !['audioResponsive', 'audioSpeedMultiplier', 'audioScaleBoost'].includes(key))
             .map(([key, value]) => (
               <ControlSlider
                 key={key}
@@ -45,6 +49,25 @@ export const ControlsTab: React.FC<ControlsTabProps> = ({
                 onReset={handleReset}
               />
             ))}
+
+          {settings.audioResponsive && (
+            <>
+              <ControlSlider
+                key="audioSpeedMultiplier"
+                keyName="audioSpeedMultiplier"
+                value={settings.audioSpeedMultiplier}
+                onChange={onSettingChange}
+                onReset={handleReset}
+              />
+              <ControlSlider
+                key="audioScaleBoost"
+                keyName="audioScaleBoost"
+                value={settings.audioScaleBoost}
+                onChange={onSettingChange}
+                onReset={handleReset}
+              />
+            </>
+          )}
         </div>
 
         <div className="controls-actions">

@@ -109,8 +109,8 @@ const analyzeAudio = () => {
 
   const isBeat = peak > 0.8;
 
-  const speedMultiplier = isBeat ? 4 : 1;
-  const scaleMultiplier = isBeat ? 1.01 : 1;
+  const speedMultiplier = isBeat ? gradientSettings.audioSpeedMultiplier : 1;
+  const scaleMultiplier = isBeat ? 1 + (gradientSettings.audioScaleBoost / 100) : 1;
 
   dynamicMultipliers = {
     speedMultiplier,

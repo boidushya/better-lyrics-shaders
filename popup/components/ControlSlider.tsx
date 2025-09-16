@@ -1,7 +1,7 @@
 import React from 'react';
 import { GradientSettings } from '../types';
 import { ResetIcon } from './ResetIcon';
-import { getControlConfig, formatValue, capitalizeFirst } from '../utils';
+import { getControlConfig, formatValue, getControlLabel } from '../utils';
 
 interface ControlSliderProps {
   keyName: string;
@@ -25,7 +25,7 @@ export const ControlSlider: React.FC<ControlSliderProps> = ({
         <label className="control-label">
           <span className="control-label__title">
             <div className="control-label__title-fixed">
-              {capitalizeFirst(keyName)}
+              {getControlLabel(keyName)}
               <ResetIcon
                 onClick={() => onReset(keyTyped)}
                 title={`Reset ${keyName} to default`}

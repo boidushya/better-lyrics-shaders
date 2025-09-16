@@ -19,6 +19,10 @@ export const getControlConfig = (key: string): ControlConfig => {
     min = 0; max = 360; step = 1; 
   } else if (key === 'speed') { 
     min = 0; max = 2; step = 0.01; 
+  } else if (key === 'audioSpeedMultiplier') {
+    min = 2; max = 8; step = 0.1;
+  } else if (key === 'audioScaleBoost') {
+    min = 0; max = 5; step = 0.1;
   }
   
   return { min, max, step };
